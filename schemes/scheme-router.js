@@ -30,13 +30,30 @@ router.get('/:id', (req, res) => {
   });
 });
 
-router.get('/:id/steps', (req, res) => {
-  const { id } = req.params;
-
-  Schemes.findSteps(id)
+router.get('/:id/steps', 
+(req, res, next) => {
+  Schemes.findById(req.params.id)
+  .then(scheme => {
+    if (scheme) {
+      req.name = scheme.scheme_name;
+      next();
+    } else {
+      res.status(404).json({ message: 'Could not find scheme with given id.' })
+    }
+  })
+  .catch(err => {
+    res.status(500).json({ message: 'Failed to get schemes' });
+  });
+}
+,(req, res) => {
+  const { id } = req.params.id;
+  Schemes.findSteps(req.params.id)
   .then(steps => {
-    if (steps.length) {
-      res.json(steps);
+    if (steps.length > 0) {
+      newSteps = steps.map(step => {
+        return {id: step.id, step_number: step.step_number, instructions: step.instructions, scheme_name: req.name}
+      });
+      res.json(newSteps);
     } else {
       res.status(404).json({ message: 'Could not find steps for given scheme' })
     }
