@@ -30,13 +30,13 @@ router.get('/:id', (req, res) => {
   });
 });
 
-router.get('/:id/steps', (req, res) => {
-  const { id } = req.params;
-
-  Schemes.findSteps(id)
+router.get('/:id/steps', 
+(req, res) => {
+  const { id } = req.params.id;
+  Schemes.findSteps(req.params.id)
   .then(steps => {
-    if (steps.length) {
-      res.json(steps);
+    if (steps.length > 0) {
+          res.json(steps);  
     } else {
       res.status(404).json({ message: 'Could not find steps for given scheme' })
     }
